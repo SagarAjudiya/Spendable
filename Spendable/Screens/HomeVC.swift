@@ -13,8 +13,21 @@ struct HomeVC: View {
     @State private var selectedObj = FilterOption()
     @StateObject private var viewModel = DateViewModel()
     
-    @State var income = [Double]()
-    @State var expense = [Double]()
+    var totalIncome: Int {
+        let totalIncome: Double = selectedObj.type?.transactionData?.reduce(0) { (result, mainData) in
+            let expenseSum = mainData.dateData?.compactMap { $0.income }.reduce(0, +) ?? 0
+            return result + expenseSum
+        } ?? 0
+        return Int(totalIncome)
+    }
+    
+    var totalExpenses: Int {
+        let totalExpenses: Double = selectedObj.type?.transactionData?.reduce(0) { (result, mainData) in
+            let expenseSum = mainData.dateData?.compactMap { $0.expense }.reduce(0, +) ?? 0
+            return result + expenseSum
+        } ?? 0
+        return Int(totalExpenses)
+    }
     
     var body: some View {
         VStack {
@@ -89,14 +102,12 @@ struct HomeVC: View {
             .padding(.horizontal)
             
             HStack {
-            
-                
                 Spacer()
                 VStack(spacing: 4) {
                     Text("Income")
                         .foregroundStyle(Color.gray)
                         .fontWeight(.medium)
-                    Text("₹500")
+                    Text("₹\(totalIncome)")
                         .foregroundStyle(Color.appWhite)
                         .font(.title2)
                         .fontWeight(.bold)
@@ -107,7 +118,7 @@ struct HomeVC: View {
                     Text("Spent")
                         .foregroundStyle(Color.gray)
                         .fontWeight(.medium)
-                    Text("₹200")
+                    Text("₹\(totalExpenses)")
                         .foregroundStyle(Color.appWhite)
                         .font(.title2)
                         .fontWeight(.bold)
@@ -118,7 +129,7 @@ struct HomeVC: View {
                     Text("Balance")
                         .foregroundStyle(Color.gray)
                         .fontWeight(.medium)
-                    Text("₹300")
+                    Text("₹\(totalIncome - totalExpenses)")
                         .foregroundStyle(Color.appWhite)
                         .font(.title2)
                         .fontWeight(.bold)
